@@ -6,11 +6,11 @@ modules:
       type: string
       view:
         render: native
-        resource: view
+        resource: single-select-view
         experience:
           - issue-view
       edit:
-        resource: edit
+        resource: single-select-edit
         render: native
         isInline: true
         experience:
@@ -22,16 +22,47 @@ modules:
 #          expression: value == null || !!value.match(configuration?.regex || "^[A-Za-z]+$")
 #          errorMessage: The value is invalid
       contextConfig:
-        resource: config
+        resource: single-select-config
+        layout: basic
+        render: native
+    - key: 00-forge-custom-field-multi-type
+      name: 00-forge-custom-field-multi-type
+      description: L2L3 Forge Custom Field Multi Type
+      type: string
+      view:
+        render: native
+        resource: multi-select-view
+        experience:
+          - issue-view
+      edit:
+        resource: multi-select-edit
+        render: native
+        isInline: true
+        experience:
+          - issue-create
+          - issue-transition
+          - issue-view
+          - portal-request
+#        validation:
+#          expression: value == null || !!value.match(configuration?.regex || "^[A-Za-z]+$")
+#          errorMessage: The value is invalid
+      contextConfig:
+        resource: multi-select-config
         layout: basic
         render: native
 resources:
-  - key: view
-    path: src/frontend/view.jsx
-  - key: edit
-    path: src/frontend/edit.jsx
-  - key: config
-    path: src/frontend/context-config.jsx
+  - key: single-select-view
+    path: src/frontend/single-select-view.jsx
+  - key: single-select-edit
+    path: src/frontend/single-select-edit.jsx
+  - key: single-select-config
+    path: src/frontend/single-select-context-config.jsx
+  - key: multi-select-view
+    path: src/frontend/multi-select-view.jsx
+  - key: multi-select-edit
+    path: src/frontend/multi-select-edit.jsx
+  - key: multi-select-config
+    path: src/frontend/multi-select-context-config.jsx
 app:
   runtime:
     name: nodejs22.x
