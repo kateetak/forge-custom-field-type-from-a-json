@@ -50,13 +50,29 @@ const View = () => {
 
     // For multiple values, display each in a box with alternating colors
     return (
-      <Stack space="space.050">
+      <Stack 
+        space="space.050"
+        xcss={{
+          borderColor: 'color.border.information', 
+          borderWidth: 'border.width.100', 
+          borderStyle: 'solid', 
+          padding: 'space.100', 
+          borderRadius: 'border.radius.100'
+        }}
+      >
         {parsedValues.map((value, index) => {
           const isEven = index % 2 === 0;
           const backgroundColor = isEven ? "color.background.neutral" : "color.background.neutral.subtle";
           
           return (
-            <Box key={index} backgroundColor={backgroundColor} padding="space.100">
+            <Box 
+              key={index} 
+              backgroundColor={backgroundColor} 
+              xcss={{
+                padding: 'space.025', 
+                borderRadius: 'border.radius.100'
+              }}
+            >
               <Text>{value}</Text>
             </Box>
           );
