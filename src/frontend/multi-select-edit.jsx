@@ -4,7 +4,7 @@ import { CustomFieldEdit } from '@forge/react/jira';
 import { view } from '@forge/bridge';
 import { options } from './config.js';
 
-const DEFAULT_LIMIT = 20;
+const DEFAULT_LIMIT = 50;
 
 const Edit = () => {
   // Transform options from config.js to Select component format
