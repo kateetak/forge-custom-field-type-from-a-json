@@ -1,0 +1,40 @@
+modules:
+  jira:customFieldType:
+    - key: 00-forge-custom-field-type
+      name: 00-forge-custom-field-type
+      description: L2L3 Forge Custom Field Type
+      type: string
+      view:
+        render: native
+        resource: view
+        experience:
+          - issue-view
+      edit:
+        resource: edit
+        render: native
+        isInline: true
+        experience:
+          - issue-create
+          - issue-transition
+          - issue-view
+          - portal-request
+#        validation:
+#          expression: value == null || !!value.match(configuration?.regex || "^[A-Za-z]+$")
+#          errorMessage: The value is invalid
+      contextConfig:
+        resource: config
+        layout: basic
+        render: native
+resources:
+  - key: view
+    path: src/frontend/view.jsx
+  - key: edit
+    path: src/frontend/edit.jsx
+  - key: config
+    path: src/frontend/context-config.jsx
+app:
+  runtime:
+    name: nodejs22.x
+    memoryMB: 256
+    architecture: arm64
+  id: ari:cloud:ecosystem::app/d3881336-c492-4cfc-b48d-542ca8da415f
