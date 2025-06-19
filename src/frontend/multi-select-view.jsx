@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import ForgeReconciler, {
   Text,
-  Tag,
-  Inline,
+  Stack,
+  Box,
 } from "@forge/react";
 import { view } from '@forge/bridge';
 
@@ -41,16 +41,27 @@ const View = () => {
     }
 
     if (parsedValues.length === 1) {
-      return <Text>{parsedValues[0]}</Text>;
+      return (
+        <Box backgroundColor="color.background.neutral" padding="space.100">
+          <Text>{parsedValues[0]}</Text>
+        </Box>
+      );
     }
 
-    // For multiple values, display as tags
+    // For multiple values, display each in a box with alternating colors
     return (
-      <Inline space="space.050">
-        {parsedValues.map((value, index) => (
-          <Tag key={index} text={value} />
-        ))}
-      </Inline>
+      <Stack space="space.050">
+        {parsedValues.map((value, index) => {
+          const isEven = index % 2 === 0;
+          const backgroundColor = isEven ? "color.background.neutral" : "color.background.neutral.subtle";
+          
+          return (
+            <Box key={index} backgroundColor={backgroundColor} padding="space.100">
+              <Text>{value}</Text>
+            </Box>
+          );
+        })}
+      </Stack>
     );
   };
 
