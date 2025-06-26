@@ -13,7 +13,7 @@ const Edit = () => {
     value: option
   }));
 
-  const [value, setValue] = useState([]);
+  const [value, setValue] = useState(null);
   const [filteredOptions, setFilteredOptions] = useState(allOptions.slice(0, DEFAULT_LIMIT));
   const [inputValue, setInputValue] = useState('');
   const context = useProductContext();
@@ -50,7 +50,7 @@ const Edit = () => {
   const onSubmit = useCallback(async () => {
     try {
       // Convert array to JSON string for submission
-      const stringValue = JSON.stringify(value);
+      const stringValue = value === null ? null : JSON.stringify(value);
       console.log(`CUSTOMFIELD_TYPE | Submitting multiselect values:`, value);
       console.log(`CUSTOMFIELD_TYPE | Submitting as JSON string: "${stringValue}"`);
       await view.submit(stringValue);
@@ -65,7 +65,9 @@ const Edit = () => {
   const handleOnChange = useCallback((selectedOptions) => {
     console.log(`CUSTOMFIELD_TYPE | handleOnChange | Options selected:`, selectedOptions);
     // selectedOptions is an array of {label, value} objects
-    const selectedValues = selectedOptions ? selectedOptions.map(option => option.value) : [];
+    const selectedValues = selectedOptions && selectedOptions.length > 0
+      ?  selectedOptions.map(option => option.value) 
+      : null;
     setValue(selectedValues);
   }, []);
 
@@ -90,7 +92,7 @@ const Edit = () => {
       <Select
         appearance="default"
         options={filteredOptions}
-        value={value.map(val => ({ label: val, value: val }))}
+        value={value ? value.map(val => ({ label: val, value: val })) : null}
         inputValue={inputValue}
         onChange={handleOnChange}
         onInputChange={handleInputChange}
