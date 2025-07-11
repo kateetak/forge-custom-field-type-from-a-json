@@ -5,6 +5,7 @@ import { view } from '@forge/bridge';
 import { options } from './config.js';
 
 const DEFAULT_LIMIT = 50;
+const LOG_PREFIX = 'CUSTOMFIELD_TYPE | multi-select-edit';
 
 const Edit = () => {
   // Transform options from config.js to Select component format
@@ -13,7 +14,7 @@ const Edit = () => {
     value: option
   }));
 
-  const [value, setValue] = useState([]);
+  const [value, setValue] = useState(null);
   const [filteredOptions, setFilteredOptions] = useState(allOptions.slice(0, DEFAULT_LIMIT));
   const [inputValue, setInputValue] = useState('');
   const context = useProductContext();
@@ -23,49 +24,38 @@ const Edit = () => {
     if (!context) {
       return;
     }
-    console.log(`CUSTOMFIELD_TYPE | Context received: ${JSON.stringify(context, null, 2)}`);
+    console.log(`${LOG_PREFIX} | Context received: ${JSON.stringify(context, null, 2)}`);
     
-    // Parse the field value - it might be a JSON string for multiselect
-    let contextValue = context.extension.fieldValue || '';
-    let parsedValue = [];
+    // Field value is always either an array or null
+    const contextValue = context.extension.fieldValue;
     
-    if (contextValue) {
-      try {
-        // Try to parse as JSON array first
-        parsedValue = JSON.parse(contextValue);
-        if (!Array.isArray(parsedValue)) {
-          // If it's not an array, treat as single value
-          parsedValue = [contextValue];
-        }
-      } catch (e) {
-        // If parsing fails, treat as single value
-        parsedValue = [contextValue];
-      }
-    }
-    
-    setValue(parsedValue);
-    console.log(`CUSTOMFIELD_TYPE | Initial values set:`, parsedValue);
+    setValue(contextValue);
+    console.log(`${LOG_PREFIX} | Initial values set:`, contextValue);
   }, [context]);
 
   const onSubmit = useCallback(async () => {
     try {
-      // Convert array to JSON string for submission
-      const stringValue = JSON.stringify(value);
-      console.log(`CUSTOMFIELD_TYPE | Submitting multiselect values:`, value);
-      console.log(`CUSTOMFIELD_TYPE | Submitting as JSON string: "${stringValue}"`);
-      await view.submit(stringValue);
+      // Submit the array/null value as JSON object
+      console.log(`${LOG_PREFIX} | Submitting multiselect values:`, value);
+      //console.log(`${LOG_PREFIX} | Submitting multiselect values as JSON:`, JSON.stringify(value));
+      await view.submit(value);
 
-      console.log(`CUSTOMFIELD_TYPE | Submit successful with values:`, value);
+      console.log(`${LOG_PREFIX} | Submit successful with values:`, value);
 
     } catch (e) {
-      console.error('CUSTOMFIELD_TYPE | Submit error:', e);
+      console.error(`${LOG_PREFIX} | Submit error:`, e);
     }
   }, [view, value]);
 
   const handleOnChange = useCallback((selectedOptions) => {
-    console.log(`CUSTOMFIELD_TYPE | handleOnChange | Options selected:`, selectedOptions);
+    console.log(`${LOG_PREFIX} | handleOnChange | Options selected:`, selectedOptions);
     // selectedOptions is an array of {label, value} objects
-    const selectedValues = selectedOptions ? selectedOptions.map(option => option.value) : [];
+    
+    const selectedValues = selectedOptions && selectedOptions.length > 0 
+      ? selectedOptions.map(option => option.value) 
+      : null;
+    
+    console.log(`${LOG_PREFIX} | handleOnChange | Selected values (indices):`, selectedValues);
     setValue(selectedValues);
   }, []);
 
@@ -90,7 +80,7 @@ const Edit = () => {
       <Select
         appearance="default"
         options={filteredOptions}
-        value={value.map(val => ({ label: val, value: val }))}
+        value={value ? value.map(val => ({ label: val, value: val })) : null}
         inputValue={inputValue}
         onChange={handleOnChange}
         onInputChange={handleInputChange}

@@ -2,7 +2,7 @@ modules:
   jira:customFieldType:
     - key: 00-forge-custom-field-type
       name: 00-forge-custom-field-type
-      description: L2L3 Forge Custom Field Type
+      description: Forge Custom Field Type
       type: string
       view:
         render: native
@@ -27,11 +27,15 @@ modules:
         render: native
     - key: 00-forge-custom-field-multi-type
       name: 00-forge-custom-field-multi-type
-      description: L2L3 Forge Custom Field Multi Type
+      description: Forge Custom Field Type | Multi String
+      #type: object
       type: string
+      collection: list
       view:
         render: native
         resource: multi-select-view
+        #formatter:
+        #  expression: "value && Array.isArray(value) ? value.join(', ') : (value || '')"
         experience:
           - issue-view
       edit:
