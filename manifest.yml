@@ -56,6 +56,8 @@ modules:
         resource: multi-select-config
         layout: basic
         render: native
+      resolver:
+        function: get-drivers
   function:
     - key: get-drivers
       handler: index.handler

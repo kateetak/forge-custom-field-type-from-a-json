@@ -1,27 +1,57 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import ForgeReconciler, { Select, useProductContext } from '@forge/react';
 import { CustomFieldEdit } from '@forge/react/jira';
-import { view } from '@forge/bridge';
-import { options } from './config.js';
+import { view, invoke } from '@forge/bridge';
 
 const DEFAULT_LIMIT = 50;
 const LOG_PREFIX = 'CUSTOMFIELD_TYPE | multi-select-edit';
 
 const Edit = () => {
-  // Transform options from config.js to Select component format
-  const allOptions = options.map(option => ({
-    label: option,
-    value: option
-  }));
-
+  const [allOptions, setAllOptions] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [value, setValue] = useState(null);
-  const [filteredOptions, setFilteredOptions] = useState(allOptions.slice(0, DEFAULT_LIMIT));
+  const [filteredOptions, setFilteredOptions] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const context = useProductContext();
 
+  // Fetch F1 drivers from backend resolver
+  useEffect(() => {
+    const fetchDrivers = async () => {
+      try {
+        console.log(`${LOG_PREFIX} | Fetching F1 drivers from backend resolver...`);
+        const drivers = await invoke('get-drivers');
+        
+        console.log(`${LOG_PREFIX} | Received ${drivers.length} drivers from resolver`);
+        
+        // Extract unique full names and create options
+        const uniqueDrivers = drivers.reduce((acc, driver) => {
+          if (!acc.find(d => d.full_name === driver.full_name)) {
+            acc.push(driver);
+          }
+          return acc;
+        }, []);
+        
+        const driverOptions = uniqueDrivers.map(driver => ({
+          label: driver.full_name,
+          value: driver.full_name
+        }));
+        
+        console.log(`${LOG_PREFIX} | Created ${driverOptions.length} unique driver options`);
+        setAllOptions(driverOptions);
+        setFilteredOptions(driverOptions.slice(0, DEFAULT_LIMIT));
+        setLoading(false);
+      } catch (error) {
+        console.error(`${LOG_PREFIX} | Error fetching drivers from resolver:`, error);
+        setLoading(false);
+      }
+    };
+
+    fetchDrivers();
+  }, []);
+
   useEffect(() => {
     // Ensure context is available before proceeding
-    if (!context) {
+    if (!context || loading) {
       return;
     }
     console.log(`${LOG_PREFIX} | Context received: ${JSON.stringify(context, null, 2)}`);
@@ -31,7 +61,7 @@ const Edit = () => {
     
     setValue(contextValue);
     console.log(`${LOG_PREFIX} | Initial values set:`, contextValue);
-  }, [context]);
+  }, [context, loading]);
 
   const onSubmit = useCallback(async () => {
     try {
@@ -77,18 +107,19 @@ const Edit = () => {
 
   return (
     <CustomFieldEdit onSubmit={onSubmit} hideActionButtons>
-      <Select
-        appearance="default"
-        options={filteredOptions}
-        value={value ? value.map(val => ({ label: val, value: val })) : null}
-        inputValue={inputValue}
-        onChange={handleOnChange}
-        onInputChange={handleInputChange}
-        placeholder="Select options..."
-        isClearable={true}
-        isSearchable={true}
-        isMulti={true}
-      />
+        <Select
+          appearance="default"
+          options={filteredOptions}
+          value={value ? value.map(val => ({ label: val, value: val })) : null}
+          inputValue={inputValue}
+          onChange={handleOnChange}
+          onInputChange={handleInputChange}
+          placeholder="Select F1 drivers..."
+          isLoading={loading}
+          isClearable={true}
+          isSearchable={true}
+          isMulti={true}
+        />
     </CustomFieldEdit>
   );
 };
