@@ -25,6 +25,8 @@ modules:
         resource: single-select-config
         layout: basic
         render: native
+      resolver:
+        function: get-drivers
     - key: 00-forge-custom-field-multi-type
       name: 00-forge-custom-field-multi-type
       description: Forge Custom Field Type | Multi String
@@ -54,6 +56,9 @@ modules:
         resource: multi-select-config
         layout: basic
         render: native
+  function:
+    - key: get-drivers
+      handler: index.handler
 resources:
   - key: single-select-view
     path: src/frontend/single-select-view.jsx
@@ -73,3 +78,8 @@ app:
     memoryMB: 256
     architecture: arm64
   id: ari:cloud:ecosystem::app/d3881336-c492-4cfc-b48d-542ca8da415f
+permissions:
+  external:
+    fetch:
+      backend:
+        - address: api.openf1.org
